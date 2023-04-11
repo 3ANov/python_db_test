@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testuser
+      - POSTGRES_DB=test_db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U testuser -d test_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    image: amacneil/dbmate
+    environment:
+      - DATABASE_URL=postgres://testuser:testuser@db:5432/test_db?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/code
+    command: -d "/code/migrations" up
+    links:
+      - db
