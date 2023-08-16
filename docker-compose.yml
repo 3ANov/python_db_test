@@ -1,5 +1,14 @@
 version: '3.9'
 services:
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/code
+    depends_on:
+      db:
+        condition: service_healthy
   db:
     image: postgres
     environment:
